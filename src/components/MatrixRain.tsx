@@ -14,6 +14,7 @@ export default function MatrixRain() {
     const fontSize = 14
     let cols: number[]
     let animId: number
+    let frame = 0
 
     const resize = () => {
       canvas.width = window.innerWidth
@@ -24,6 +25,11 @@ export default function MatrixRain() {
     window.addEventListener('resize', resize)
 
     const draw = () => {
+      frame++
+      if (frame % 3 !== 0) {
+        animId = requestAnimationFrame(draw)
+        return
+      }
       ctx.fillStyle = 'rgba(0,0,0,0.05)'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
       ctx.font = `${fontSize}px monospace`
