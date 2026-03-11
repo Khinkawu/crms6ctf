@@ -348,6 +348,15 @@ export default function SeedPage() {
         </div>
       )}
 
+      <div className="border-t border-gray-700 pt-6">
+        <button
+          onClick={() => router.push(`/${locale}/coach/seed2`)}
+          className="w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-2 rounded-lg transition-colors text-sm mb-6"
+        >
+          📦 ไปที่ Seed Batch 2 (56 โจทย์ใหม่)
+        </button>
+      </div>
+
       <div className="border-t border-gray-700 pt-6 space-y-3">
         <div className="text-sm text-gray-400">
           <span className="text-yellow-400 font-bold">Fix Mode</span> — แก้ไข description ของ Caesar&apos;s Ghost และ XOR Warrior ใน Firestore
