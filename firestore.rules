@@ -2,11 +2,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{uid} {
-      allow read: if request.auth != null;
-      allow write: if request.auth.uid == uid;
+      allow read: if true; // public for leaderboard
+      allow write: if request.auth != null && request.auth.uid == uid;
     }
     match /challenges/{id} {
-      allow read: if request.auth != null && resource.data.visible == true;
+      allow read: if resource.data.visible == true; // public, no auth needed
       allow write: if request.auth != null &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'coach';
     }
@@ -17,8 +17,7 @@ service cloud.firestore {
       allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
     }
     match /hints_used/{id} {
-      allow read, write: if request.auth != null &&
-        (resource.data.uid == request.auth.uid || !exists(/databases/$(database)/documents/hints_used/$(id)));
+      allow read, write: if request.auth != null;
       allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
     }
   }

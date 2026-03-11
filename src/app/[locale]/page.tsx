@@ -13,11 +13,13 @@ export default function HomePage() {
 
   useEffect(() => {
     async function loadStats() {
-      const [cSnap, uSnap] = await Promise.all([
-        getCountFromServer(query(collection(db, 'challenges'), where('visible', '==', true))),
-        getCountFromServer(collection(db, 'users')),
-      ])
-      setStats(s => ({ ...s, challenges: cSnap.data().count, players: uSnap.data().count }))
+      try {
+        const [cSnap, uSnap] = await Promise.all([
+          getCountFromServer(query(collection(db, 'challenges'), where('visible', '==', true))),
+          getCountFromServer(collection(db, 'users')),
+        ])
+        setStats(s => ({ ...s, challenges: cSnap.data().count, players: uSnap.data().count }))
+      } catch { /* rules not ready or unauthenticated — show defaults */ }
     }
     loadStats()
   }, [])

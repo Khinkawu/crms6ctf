@@ -23,7 +23,7 @@ export default function Leaderboard() {
         first_bloods: d.data().first_bloods || 0,
         last_solve_time: d.data().last_solve_time || null,
       })))
-    })
+    }, () => { /* permission denied — no users yet */ })
     return unsub
   }, [])
 

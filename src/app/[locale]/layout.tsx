@@ -1,4 +1,5 @@
-import { NextIntlClientProvider, useMessages } from 'next-intl'
+import { NextIntlClientProvider } from 'next-intl'
+import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { AuthProvider } from '@/hooks/useAuth'
 import Navbar from '@/components/Navbar'
@@ -8,15 +9,16 @@ import '../globals.css'
 const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono' })
 const locales = ['th', 'en']
 
-export default function LocaleLayout({
+export default async function LocaleLayout({
   children,
-  params: { locale },
+  params,
 }: {
   children: React.ReactNode
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
+  const { locale } = await params
   if (!locales.includes(locale)) notFound()
-  const messages = useMessages()
+  const messages = await getMessages({ locale })
 
   return (
     <html lang={locale} className="dark">

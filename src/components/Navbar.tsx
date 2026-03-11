@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl'
 import { useParams, useRouter, usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { useState } from 'react'
+import Image from 'next/image'
 
 export default function Navbar() {
   const t = useTranslations('nav')
@@ -28,8 +29,9 @@ export default function Navbar() {
   return (
     <nav className="border-b border-gray-800 bg-gray-950/90 backdrop-blur sticky top-0 z-50">
       <div className="container mx-auto px-4 max-w-6xl flex items-center justify-between h-14">
-        <button onClick={() => router.push(`/${locale}`)} className="text-cyan-400 font-bold text-lg tracking-widest">
-          CRMS6<span className="text-gray-500">_</span>CTF
+        <button onClick={() => router.push(`/${locale}`)} className="flex items-center gap-2">
+          <Image src="/logo.png" alt="CRMS6 CTF" width={32} height={32} className="rounded" />
+          <span className="text-cyan-400 font-bold text-lg tracking-widest">CRMS6<span className="text-gray-500">_</span>CTF</span>
         </button>
 
         <div className="hidden md:flex items-center gap-6">
