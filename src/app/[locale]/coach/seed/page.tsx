@@ -249,6 +249,7 @@ export default function SeedPage() {
   const [patchStatus, setPatchStatus] = useState<'idle' | 'running' | 'done' | 'error'>('idle')
   const [deleteStatus, setDeleteStatus] = useState<'idle' | 'running' | 'done'>('idle')
   const [deleteCount, setDeleteCount] = useState(0)
+  const [resetStatus, setResetStatus] = useState<'idle' | 'running' | 'done'>('idle')
 
   if (profile?.role !== 'coach') return (
     <div className="text-center py-16 space-y-2 font-mono text-sm">
@@ -327,6 +328,58 @@ export default function SeedPage() {
     } catch (e: any) {
       addLog(`❌ Delete error: ${e.message}`)
       setDeleteStatus('idle')
+    }
+  }
+
+  const runReset = async () => {
+    if (!confirm('⚠️ Reset ทุกอย่างกลับเป็น 0? (คะแนน, ประวัติ, firstblood ทั้งหมด — ไม่ลบ user)')) return
+    setResetStatus('running')
+    try {
+      const currentUser = auth.currentUser
+      if (!currentUser) { setResetStatus('idle'); return }
+      await currentUser.getIdToken(true)
+
+      // 1. Delete all submissions
+      const subSnap = await getDocs(collection(db, 'submissions'))
+      for (const d of subSnap.docs) await deleteDoc(d.ref)
+      addLog(`🗑️ submissions: ลบ ${subSnap.size} รายการ`)
+
+      // 2. Delete all hints_used
+      const hintSnap = await getDocs(collection(db, 'hints_used'))
+      for (const d of hintSnap.docs) await deleteDoc(d.ref)
+      addLog(`🗑️ hints_used: ลบ ${hintSnap.size} รายการ`)
+
+      // 3. Reset challenges (solve_count, blood, current_points → base_points)
+      const chalSnap = await getDocs(collection(db, 'challenges'))
+      for (const d of chalSnap.docs) {
+        await updateDoc(d.ref, {
+          solve_count: 0,
+          first_blood_uid: null,
+          second_blood_uid: null,
+          third_blood_uid: null,
+          current_points: d.data().base_points,
+        })
+      }
+      addLog(`✓ challenges: reset ${chalSnap.size} โจทย์`)
+
+      // 4. Reset user profiles (keep user, clear scores)
+      const userSnap = await getDocs(collection(db, 'users'))
+      for (const d of userSnap.docs) {
+        await updateDoc(d.ref, {
+          total_points: 0,
+          solved_challenges: [],
+          first_bloods: 0,
+          hints_used: 0,
+          hints_penalty_total: 0,
+          first_solve_time: null,
+        })
+      }
+      addLog(`✓ users: reset ${userSnap.size} คน`)
+      addLog('✅ Reset เสร็จแล้ว!')
+      setResetStatus('done')
+    } catch (e: any) {
+      addLog(`❌ Reset error: ${e.message}`)
+      setResetStatus('idle')
     }
   }
 
@@ -425,14 +478,21 @@ export default function SeedPage() {
 
       <div className="border-t border-gray-700 pt-6 space-y-3">
         <div className="text-sm text-gray-400">
-          <span className="text-red-400 font-bold">Danger Zone</span> — ลบโจทย์ทั้งหมดออกจาก Firestore (ใช้ก่อน re-seed)
+          <span className="text-red-400 font-bold">Danger Zone</span>
         </div>
+        <button
+          onClick={runReset}
+          disabled={resetStatus === 'running'}
+          className="w-full bg-orange-900 hover:bg-orange-800 border border-orange-700 text-orange-300 font-bold py-2 rounded-lg transition-colors text-sm disabled:opacity-40"
+        >
+          {resetStatus === 'running' ? 'กำลัง reset...' : resetStatus === 'done' ? '✅ Reset เสร็จแล้ว!' : '🔄 Reset การแข่งขัน (คะแนน/ประวัติ/Firstblood → 0)'}
+        </button>
         <button
           onClick={runDeleteAll}
           disabled={deleteStatus === 'running'}
           className="w-full bg-red-900 hover:bg-red-800 border border-red-700 text-red-300 font-bold py-2 rounded-lg transition-colors text-sm disabled:opacity-40"
         >
-          {deleteStatus === 'running' ? `กำลังลบ... (${deleteCount})` : deleteStatus === 'done' ? '✅ ลบทั้งหมดแล้ว — กด Seed ใหม่ได้' : '🗑️ Delete All Challenges'}
+          {deleteStatus === 'running' ? `กำลังลบ... (${deleteCount})` : deleteStatus === 'done' ? '✅ ลบทั้งหมดแล้ว — กด Seed ใหม่ได้' : '🗑️ Delete All Challenges (ลบโจทย์ทั้งหมด)'}
         </button>
       </div>
 
