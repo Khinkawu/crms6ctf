@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /secret-vault-7f3a9d/
+
+# ยังมีอะไรซ่อนอยู่อีกไหม?
