@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { collection, addDoc, getDocs, serverTimestamp } from 'firebase/firestore'
+import { collection, addDoc, getCountFromServer, serverTimestamp } from 'firebase/firestore'
 import { db, auth } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -216,9 +216,10 @@ export default function SeedPage() {
       // Force-refresh token to ensure Firestore has valid credentials
       await currentUser.getIdToken(true)
       addLog('token refreshed ✓')
-      const existing = await getDocs(collection(db, 'challenges'))
-      if (existing.size > 0) {
-        addLog(`⚠️  มีโจทย์อยู่แล้ว ${existing.size} ข้อ — ลบก่อนถึงจะ seed ใหม่ได้`)
+      const snap = await getCountFromServer(collection(db, 'challenges'))
+      const existingCount = snap.data().count
+      if (existingCount > 0) {
+        addLog(`⚠️  มีโจทย์อยู่แล้ว ${existingCount} ข้อ — ลบก่อนถึงจะ seed ใหม่ได้`)
         setStatus('error')
         return
       }
