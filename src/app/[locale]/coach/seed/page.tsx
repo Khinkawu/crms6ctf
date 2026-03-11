@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { collection, addDoc, getCountFromServer, serverTimestamp } from 'firebase/firestore'
+import { collection, addDoc, getCountFromServer, getDocs, query, where, updateDoc, serverTimestamp } from 'firebase/firestore'
 import { db, auth } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -41,8 +41,8 @@ const CHALLENGES = [
   // ── CRYPTO ──
   {
     title_th: '亡靈凱撒', title_en: "Caesar's Ghost",
-    description_th: 'จักรพรรดิ Caesar ใช้รหัสลับที่ง่ายมาก\nช่วยถอดรหัสข้อความนี้:\n\n```\nsynt{26r720122sr34beb1b49ed96264ea86f}\n```',
-    description_en: "Julius Caesar used a simple cipher.\nDecode this:\n\n```\nsynt{26r720122sr34beb1b49ed96264ea86f}\n```",
+    description_th: 'จักรพรรดิ Caesar ใช้รหัสลับที่ง่ายมาก\nช่วยถอดรหัสข้อความนี้:\n\n```\nsynt{26r720122sr34oro1o49rq96264rn86s}\n```',
+    description_en: "Julius Caesar used a simple cipher.\nDecode this:\n\n```\nsynt{26r720122sr34oro1o49rq96264rn86s}\n```",
     category: 'CRYPTO', difficulty: 'Easy', base_points: 100,
     flag: 'flag{26e720122fe34beb1b49ed96264ea86f}',
     hints: [
@@ -50,7 +50,7 @@ const CHALLENGES = [
       { text_th: 'python: codecs.decode("synt{...}", "rot_13")', text_en: 'python: codecs.decode("synt{...}", "rot_13")', penalty_pct: 25 },
       { text_th: 'CyberChef → ROT13', text_en: 'CyberChef → ROT13', penalty_pct: 50 },
     ],
-    solution_th: 'codecs.decode("synt{26r720122sr34beb1b49ed96264ea86f}", "rot_13")',
+    solution_th: 'codecs.decode("synt{26r720122sr34oro1o49rq96264rn86s}", "rot_13")',
     visible: true,
   },
   {
@@ -83,8 +83,8 @@ const CHALLENGES = [
   },
   {
     title_th: 'นักรบ XOR', title_en: 'XOR Warrior',
-    description_th: 'XOR คืออาวุธลับของ cryptographer\nถอดรหัส hex string นี้ด้วย single-byte key:\n\n```\n242e23253973237a7127202124717a26757a7b7a202c71201c352920347a2024247a7120343b7a2125352024211920202120207a21\n```',
-    description_en: 'XOR is the secret weapon of cryptographers.\nDecrypt this hex with a single-byte key:\n\n```\n242e23253973237a7127202124717a26757a7b7a202c71201c352920347a2024247a7120343b7a2125352024211920202120207a21\n```',
+    description_th: 'XOR คืออาวุธลับของ cryptographer\nถอดรหัส hex string นี้ด้วย single-byte key:\n\n```\n242e23253973237a7127202124717a26757a7b7a207a7a21277777722072727624777072763f\n```',
+    description_en: 'XOR is the secret weapon of cryptographers.\nDecrypt this hex with a single-byte key:\n\n```\n242e23253973237a7127202124717a26757a7b7a207a7a21277777722072727624777072763f\n```',
     category: 'CRYPTO', difficulty: 'Hard', base_points: 500,
     flag: 'flag{1a83ebcf38d7898b88ce550b004f5204}',
     hints: [
@@ -92,7 +92,7 @@ const CHALLENGES = [
       { text_th: 'flag ขึ้นต้นด้วย "flag{" ใช้ check key', text_en: 'Valid flag starts with "flag{" — use this to find the key', penalty_pct: 25 },
       { text_th: 'bytes(b ^ 0x42 for b in bytes.fromhex(...))', text_en: 'bytes(b ^ 0x42 for b in bytes.fromhex(...))', penalty_pct: 50 },
     ],
-    solution_th: 'key = 0x42\nbytes(b ^ 0x42 for b in bytes.fromhex("242e...")).decode()',
+    solution_th: 'key = 0x42\nbytes(b ^ 0x42 for b in bytes.fromhex("242e23253973237a7127202124717a26757a7b7a207a7a21277777722072727624777072763f")).decode()',
     visible: true,
   },
   // ── MISC ──
@@ -183,6 +183,22 @@ const CHALLENGES = [
   },
 ]
 
+// Patches for already-seeded challenges (description corrections only)
+const PATCHES = [
+  {
+    title_en: "Caesar's Ghost",
+    description_th: 'จักรพรรดิ Caesar ใช้รหัสลับที่ง่ายมาก\nช่วยถอดรหัสข้อความนี้:\n\n```\nsynt{26r720122sr34oro1o49rq96264rn86s}\n```',
+    description_en: "Julius Caesar used a simple cipher.\nDecode this:\n\n```\nsynt{26r720122sr34oro1o49rq96264rn86s}\n```",
+    solution_th: 'codecs.decode("synt{26r720122sr34oro1o49rq96264rn86s}", "rot_13")',
+  },
+  {
+    title_en: 'XOR Warrior',
+    description_th: 'XOR คืออาวุธลับของ cryptographer\nถอดรหัส hex string นี้ด้วย single-byte key:\n\n```\n242e23253973237a7127202124717a26757a7b7a207a7a21277777722072727624777072763f\n```',
+    description_en: 'XOR is the secret weapon of cryptographers.\nDecrypt this hex with a single-byte key:\n\n```\n242e23253973237a7127202124717a26757a7b7a207a7a21277777722072727624777072763f\n```',
+    solution_th: 'key = 0x42\nbytes(b ^ 0x42 for b in bytes.fromhex("242e23253973237a7127202124717a26757a7b7a207a7a21277777722072727624777072763f")).decode()',
+  },
+]
+
 export default function SeedPage() {
   const { profile, user } = useAuth()
   const { locale } = useParams()
@@ -190,6 +206,7 @@ export default function SeedPage() {
   const [status, setStatus] = useState<'idle' | 'running' | 'done' | 'error'>('idle')
   const [log, setLog] = useState<string[]>([])
   const [count, setCount] = useState(0)
+  const [patchStatus, setPatchStatus] = useState<'idle' | 'running' | 'done' | 'error'>('idle')
 
   if (profile?.role !== 'coach') return (
     <div className="text-center py-16 space-y-2 font-mono text-sm">
@@ -244,6 +261,31 @@ export default function SeedPage() {
     } catch (e: any) {
       addLog(`❌ Error: ${e.message}`)
       setStatus('error')
+    }
+  }
+
+  const runPatch = async () => {
+    setPatchStatus('running')
+    try {
+      const currentUser = auth.currentUser
+      if (!currentUser) { setPatchStatus('error'); return }
+      await currentUser.getIdToken(true)
+      for (const patch of PATCHES) {
+        const q = query(collection(db, 'challenges'), where('title_en', '==', patch.title_en))
+        const snap = await getDocs(q)
+        if (snap.empty) {
+          addLog(`⚠️  ไม่พบ: ${patch.title_en}`)
+        } else {
+          const { title_en, ...fields } = patch
+          await updateDoc(snap.docs[0].ref, fields)
+          addLog(`✓ patched: ${patch.title_en}`)
+        }
+      }
+      addLog('✅ Patch เสร็จแล้ว')
+      setPatchStatus('done')
+    } catch (e: any) {
+      addLog(`❌ Patch error: ${e.message}`)
+      setPatchStatus('error')
     }
   }
 
@@ -305,6 +347,23 @@ export default function SeedPage() {
           {log.map((l, i) => <div key={i}>{l}</div>)}
         </div>
       )}
+
+      <div className="border-t border-gray-700 pt-6 space-y-3">
+        <div className="text-sm text-gray-400">
+          <span className="text-yellow-400 font-bold">Fix Mode</span> — แก้ไข description ของ Caesar&apos;s Ghost และ XOR Warrior ใน Firestore
+        </div>
+        {patchStatus !== 'running' && (
+          <button
+            onClick={runPatch}
+            className="w-full bg-yellow-600 hover:bg-yellow-500 text-gray-950 font-bold py-2 rounded-lg transition-colors text-sm"
+          >
+            {patchStatus === 'done' ? '✅ Patched!' : 'Patch 2 Challenges (Caesar + XOR)'}
+          </button>
+        )}
+        {patchStatus === 'running' && (
+          <div className="text-center text-yellow-400 text-sm py-2">กำลัง patch...</div>
+        )}
+      </div>
     </div>
   )
 }
