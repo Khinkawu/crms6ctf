@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app'
 import { getAuth, GoogleAuthProvider } from 'firebase/auth'
-import { initializeFirestore, getFirestore, CACHE_SIZE_UNLIMITED } from 'firebase/firestore'
+import { getFirestore } from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,15 +11,8 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 }
 
-const isNew = getApps().length === 0
-const app = isNew ? initializeApp(firebaseConfig) : getApps()[0]
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]
 export const auth = getAuth(app)
-
-// Use experimentalAutoDetectLongPolling to avoid WebSocket watch stream
-// internal assertion failures when multiple rapid writes occur alongside onSnapshot
-export const db = isNew
-  ? initializeFirestore(app, { experimentalAutoDetectLongPolling: true })
-  : getFirestore(app)
-
+export const db = getFirestore(app)
 export const googleProvider = new GoogleAuthProvider()
 export default app

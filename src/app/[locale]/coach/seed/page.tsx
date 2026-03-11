@@ -213,6 +213,9 @@ export default function SeedPage() {
         setStatus('error')
         return
       }
+      // Force-refresh token to ensure Firestore has valid credentials
+      await currentUser.getIdToken(true)
+      addLog('token refreshed ✓')
       const existing = await getDocs(collection(db, 'challenges'))
       if (existing.size > 0) {
         addLog(`⚠️  มีโจทย์อยู่แล้ว ${existing.size} ข้อ — ลบก่อนถึงจะ seed ใหม่ได้`)
