@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { collection, addDoc, getCountFromServer, getDocs, query, where, updateDoc, serverTimestamp } from 'firebase/firestore'
+import { collection, addDoc, getCountFromServer, getDocs, query, where, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { db, auth } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -247,6 +247,8 @@ export default function SeedPage() {
   const [log, setLog] = useState<string[]>([])
   const [count, setCount] = useState(0)
   const [patchStatus, setPatchStatus] = useState<'idle' | 'running' | 'done' | 'error'>('idle')
+  const [deleteStatus, setDeleteStatus] = useState<'idle' | 'running' | 'done'>('idle')
+  const [deleteCount, setDeleteCount] = useState(0)
 
   if (profile?.role !== 'coach') return (
     <div className="text-center py-16 space-y-2 font-mono text-sm">
@@ -301,6 +303,30 @@ export default function SeedPage() {
     } catch (e: any) {
       addLog(`❌ Error: ${e.message}`)
       setStatus('error')
+    }
+  }
+
+  const runDeleteAll = async () => {
+    if (!confirm('⚠️ ลบโจทย์ทั้งหมดออกจาก Firestore? ไม่สามารถกู้คืนได้!')) return
+    setDeleteStatus('running')
+    setDeleteCount(0)
+    try {
+      const currentUser = auth.currentUser
+      if (!currentUser) { setDeleteStatus('idle'); return }
+      await currentUser.getIdToken(true)
+      const snap = await getDocs(collection(db, 'challenges'))
+      let n = 0
+      for (const d of snap.docs) {
+        await deleteDoc(d.ref)
+        n++
+        setDeleteCount(n)
+      }
+      addLog(`🗑️ ลบแล้ว ${n} โจทย์`)
+      setDeleteStatus('done')
+      setStatus('idle')
+    } catch (e: any) {
+      addLog(`❌ Delete error: ${e.message}`)
+      setDeleteStatus('idle')
     }
   }
 
@@ -399,14 +425,27 @@ export default function SeedPage() {
 
       <div className="border-t border-gray-700 pt-6 space-y-3">
         <div className="text-sm text-gray-400">
-          <span className="text-yellow-400 font-bold">Fix Mode</span> — แก้ไข description ของ Caesar&apos;s Ghost และ XOR Warrior ใน Firestore
+          <span className="text-red-400 font-bold">Danger Zone</span> — ลบโจทย์ทั้งหมดออกจาก Firestore (ใช้ก่อน re-seed)
+        </div>
+        <button
+          onClick={runDeleteAll}
+          disabled={deleteStatus === 'running'}
+          className="w-full bg-red-900 hover:bg-red-800 border border-red-700 text-red-300 font-bold py-2 rounded-lg transition-colors text-sm disabled:opacity-40"
+        >
+          {deleteStatus === 'running' ? `กำลังลบ... (${deleteCount})` : deleteStatus === 'done' ? '✅ ลบทั้งหมดแล้ว — กด Seed ใหม่ได้' : '🗑️ Delete All Challenges'}
+        </button>
+      </div>
+
+      <div className="border-t border-gray-700 pt-6 space-y-3">
+        <div className="text-sm text-gray-400">
+          <span className="text-yellow-400 font-bold">Fix Mode</span> — อัปเดต solution ทุกข้อให้แสดง flag ชัดเจน
         </div>
         {patchStatus !== 'running' && (
           <button
             onClick={runPatch}
             className="w-full bg-yellow-600 hover:bg-yellow-500 text-gray-950 font-bold py-2 rounded-lg transition-colors text-sm"
           >
-            {patchStatus === 'done' ? '✅ Patched!' : 'Patch 2 Challenges (Caesar + XOR)'}
+            {patchStatus === 'done' ? '✅ Patched!' : 'Patch All Solutions (แสดง flag ทุกข้อ)'}
           </button>
         )}
         {patchStatus === 'running' && (
