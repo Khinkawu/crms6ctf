@@ -38,6 +38,7 @@ export default function ChallengePage() {
 
   const title       = locale === 'th' ? challenge.title_th       : challenge.title_en
   const description = locale === 'th' ? challenge.description_th : challenge.description_en
+  const writeup     = locale === 'th' ? challenge.writeup_th     : challenge.writeup_en
 
   return (
     <div className="max-w-3xl mx-auto space-y-4">
@@ -86,22 +87,13 @@ export default function ChallengePage() {
         {/* Divider */}
         <div className="border-t border-gray-800" />
 
-        {/* Description — overflow safe */}
-        <div className="text-sm text-gray-300 leading-relaxed space-y-3">
-          {description.split('\n').map((line, i) => {
-            // Detect code-like lines (starts with spaces/tabs, or has backticks)
-            const isCode = /^(\s{2,}|`|    |\t)/.test(line) || line.includes('`')
-            if (isCode && line.trim()) {
-              return (
-                <code key={i} className="block bg-gray-800/80 border border-gray-700/50 rounded-md px-3 py-1.5 font-mono text-xs text-cyan-200 overflow-x-auto whitespace-pre">
-                  {line}
-                </code>
-              )
-            }
-            return line.trim()
-              ? <p key={i} className="break-words">{line}</p>
+        {/* Description — plain text, safe overflow */}
+        <div className="text-sm text-gray-300 leading-relaxed space-y-2">
+          {description.split('\n').map((line, i) =>
+            line.trim()
+              ? <p key={i} className="break-words overflow-x-auto">{line}</p>
               : <div key={i} className="h-1" />
-          })}
+          )}
         </div>
 
         {/* Attachment */}
@@ -124,14 +116,17 @@ export default function ChallengePage() {
         </div>
       )}
 
-      {/* Submit */}
+      {/* Submit / Writeup */}
       {user && profile ? (
         <div className="bg-gray-900/80 border border-gray-700/60 rounded-xl p-5">
-          <h3 className="text-xs text-gray-500 uppercase tracking-widest font-mono mb-3">Submit Flag</h3>
+          {!solved && (
+            <h3 className="text-xs text-gray-500 uppercase tracking-widest font-mono mb-3">Submit Flag</h3>
+          )}
           <FlagSubmitForm
             challenge={challenge}
             userId={user.uid}
             profile={profile}
+            locale={locale}
             onSolved={() => setSolved(true)}
           />
         </div>

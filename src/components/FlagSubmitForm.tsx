@@ -15,13 +15,15 @@ interface Props {
   userId: string
   profile: UserProfile
   onSolved: (points: number) => void
+  locale?: string
 }
 
-export default function FlagSubmitForm({ challenge, userId, profile, onSolved }: Props) {
+export default function FlagSubmitForm({ challenge, userId, profile, onSolved, locale = 'th' }: Props) {
   const t = useTranslations('challenges')
   const [input, setInput] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'correct' | 'wrong' | 'already'>('idle')
   const [pointsAwarded, setPointsAwarded] = useState(0)
+  const writeup = locale === 'th' ? challenge.writeup_th : challenge.writeup_en
 
   const alreadySolved = profile.solved_challenges.includes(challenge.id)
 
@@ -95,13 +97,27 @@ export default function FlagSubmitForm({ challenge, userId, profile, onSolved }:
 
   if (alreadySolved || status === 'correct') {
     return (
-      <div className="bg-green-950/30 border border-green-800 rounded-lg p-4 text-center">
-        <div className="text-green-400 font-bold">
-          {status === 'correct'
-            ? t('flag_correct', { points: pointsAwarded })
-            : t('flag_already_solved')
-          }
+      <div className="space-y-4">
+        <div className="bg-green-950/30 border border-green-800/60 rounded-lg p-4 text-center">
+          <div className="text-green-400 font-bold text-sm">
+            {status === 'correct'
+              ? t('flag_correct', { points: pointsAwarded })
+              : t('flag_already_solved')
+            }
+          </div>
         </div>
+        {writeup && (
+          <div className="space-y-2">
+            <h3 className="text-xs text-green-400 uppercase tracking-widest font-mono">✓ Writeup</h3>
+            <div className="text-sm text-gray-300 leading-relaxed space-y-2">
+              {writeup.split('\n').map((line, i) =>
+                line.trim()
+                  ? <p key={i} className="break-words">{line}</p>
+                  : <div key={i} className="h-1" />
+              )}
+            </div>
+          </div>
+        )}
       </div>
     )
   }

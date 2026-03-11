@@ -28,6 +28,8 @@ export interface Challenge {
   visible: boolean
   created_at: any
   attachment_url?: string
+  writeup_th?: string
+  writeup_en?: string
 }
 
 export interface Submission {
