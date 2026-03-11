@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { collection, addDoc, getDocs, serverTimestamp } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
+import { db, auth } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
 
 async function sha256(text: string) {
@@ -184,14 +184,20 @@ const CHALLENGES = [
 ]
 
 export default function SeedPage() {
-  const { profile } = useAuth()
+  const { profile, user } = useAuth()
   const { locale } = useParams()
   const router = useRouter()
   const [status, setStatus] = useState<'idle' | 'running' | 'done' | 'error'>('idle')
   const [log, setLog] = useState<string[]>([])
   const [count, setCount] = useState(0)
 
-  if (profile?.role !== 'coach') return null
+  if (profile?.role !== 'coach') return (
+    <div className="text-center py-16 space-y-2 font-mono text-sm">
+      <div className="text-red-400">Access denied</div>
+      <div className="text-gray-500">uid: {user?.uid || 'not logged in'}</div>
+      <div className="text-gray-500">role: {profile?.role || 'no profile'}</div>
+    </div>
+  )
 
   const addLog = (msg: string) => setLog(l => [...l, msg])
 
@@ -199,6 +205,14 @@ export default function SeedPage() {
     setStatus('running')
     setLog([])
     try {
+      const currentUser = auth.currentUser
+      addLog(`auth.currentUser: ${currentUser?.uid || 'null'}`)
+      addLog(`profile.role: ${profile?.role}`)
+      if (!currentUser) {
+        addLog('❌ ไม่มี auth session — ลอง reload แล้ว login ใหม่')
+        setStatus('error')
+        return
+      }
       const existing = await getDocs(collection(db, 'challenges'))
       if (existing.size > 0) {
         addLog(`⚠️  มีโจทย์อยู่แล้ว ${existing.size} ข้อ — ลบก่อนถึงจะ seed ใหม่ได้`)
