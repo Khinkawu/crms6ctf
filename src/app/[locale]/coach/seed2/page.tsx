@@ -1106,6 +1106,10 @@ export default function Seed2Page() {
       for (const ch of CHALLENGES_2) {
         const { flag, ...rest } = ch as any
         const flag_hash = await sha256(flag)
+        // Auto-append flag to solution_th if not already there
+        if (rest.solution_th && !rest.solution_th.includes('flag{')) {
+          rest.solution_th = `${rest.solution_th}\n→ ${flag}`
+        }
         await addDoc(collection(db, 'challenges'), {
           ...rest,
           flag_hash,

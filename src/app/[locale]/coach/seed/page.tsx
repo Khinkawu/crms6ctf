@@ -183,19 +183,59 @@ const CHALLENGES = [
   },
 ]
 
-// Patches for already-seeded challenges (description corrections only)
+// Patches for already-seeded challenges (description + solution corrections)
 const PATCHES = [
+  {
+    title_en: 'Hello CTF',
+    solution_th: 'Base64 decode → flag{f84e0b10bf719f0f47aa9dbaecb1e9f4}',
+  },
+  {
+    title_en: 'Binary Breakfast',
+    solution_th: "''.join(chr(int(b,2)) for b in bits.split()) → flag{f0815c113e766896940e9579089968b1}",
+  },
   {
     title_en: "Caesar's Ghost",
     description_th: 'จักรพรรดิ Caesar ใช้รหัสลับที่ง่ายมาก\nช่วยถอดรหัสข้อความนี้:\n\n```\nsynt{26r720122sr34oro1o49rq96264rn86s}\n```',
     description_en: "Julius Caesar used a simple cipher.\nDecode this:\n\n```\nsynt{26r720122sr34oro1o49rq96264rn86s}\n```",
-    solution_th: 'codecs.decode("synt{26r720122sr34oro1o49rq96264rn86s}", "rot_13")',
+    solution_th: 'codecs.decode("synt{26r720122sr34oro1o49rq96264rn86s}", "rot_13") → flag{26e720122fe34beb1b49ed96264ea86f}',
+  },
+  {
+    title_en: 'Base Not Found',
+    solution_th: 'Base64 → Base32 → flag{467605cfbcc845d1e50b1ccd1442df64}',
+  },
+  {
+    title_en: 'Emoji Cipher',
+    solution_th: "''.join(chr(ord(e)-0x1F600+32) for e in emojis) → flag{3df627ef949c6047e937e3dc4a11b3f1}",
   },
   {
     title_en: 'XOR Warrior',
     description_th: 'XOR คืออาวุธลับของ cryptographer\nถอดรหัส hex string นี้ด้วย single-byte key:\n\n```\n242e23253973237a7127202124717a26757a7b7a207a7a21277777722072727624777072763f\n```',
     description_en: 'XOR is the secret weapon of cryptographers.\nDecrypt this hex with a single-byte key:\n\n```\n242e23253973237a7127202124717a26757a7b7a207a7a21277777722072727624777072763f\n```',
-    solution_th: 'key = 0x42\nbytes(b ^ 0x42 for b in bytes.fromhex("242e23253973237a7127202124717a26757a7b7a207a7a21277777722072727624777072763f")).decode()',
+    solution_th: 'key = 0x42\nbytes(b ^ 0x42 for b in bytes.fromhex("...")).decode() → flag{1a83ebcf38d7898b88ce550b004f5204}',
+  },
+  {
+    title_en: 'Morse in the Dark',
+    solution_th: 'Morse decode → flag{e1ebc82566077b543d0d5dea45849d6b}',
+  },
+  {
+    title_en: 'Chain Reaction',
+    solution_th: "Base64 → reverse → flag{6b5e86ed3fc1c0daaa100f211182ba31}",
+  },
+  {
+    title_en: 'Hidden in Plain Sight',
+    solution_th: 'exiftool hidden-metadata.jpg | grep "User Comment" → flag{bef449197a983758d49a626bd3bef897}',
+  },
+  {
+    title_en: 'File Disguise',
+    solution_th: 'file → Zip archive → unzip → cat flag.txt → flag{28baa517161a68dae9111310ae1099cb}',
+  },
+  {
+    title_en: 'Cookie Monster',
+    solution_th: 'session_token cookie → Base64 decode → flag{b13ed3441e10af450d63360a5e6f1b82}',
+  },
+  {
+    title_en: 'robots.txt',
+    solution_th: '/robots.txt → Disallow: /secret-vault-7f3a9d/ → visit it → flag{d4078fd0f999e68088896142089c4baf}',
   },
 ]
 
