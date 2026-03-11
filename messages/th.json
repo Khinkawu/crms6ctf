@@ -50,7 +50,7 @@
     "second_blood": "Second Blood",
     "third_blood": "Third Blood",
     "submit_flag": "ส่ง Flag",
-    "flag_placeholder": "flag{...}",
+    "flag_placeholder": "flag'{'...'}'",
     "flag_correct": "ถูกต้อง! ได้รับ {points} คะแนน",
     "flag_wrong": "Flag ไม่ถูกต้อง ลองใหม่อีกครั้ง",
     "flag_already_solved": "คุณแก้โจทย์นี้แล้ว",

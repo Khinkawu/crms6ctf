@@ -50,7 +50,7 @@
     "second_blood": "Second Blood",
     "third_blood": "Third Blood",
     "submit_flag": "Submit Flag",
-    "flag_placeholder": "flag{...}",
+    "flag_placeholder": "flag'{'...'}'",
     "flag_correct": "Correct! +{points} points",
     "flag_wrong": "Wrong flag. Try again.",
     "flag_already_solved": "You already solved this challenge.",
