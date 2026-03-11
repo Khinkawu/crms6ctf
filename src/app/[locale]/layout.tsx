@@ -3,6 +3,7 @@ import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { AuthProvider } from '@/hooks/useAuth'
 import Navbar from '@/components/Navbar'
+import MatrixRain from '@/components/MatrixRain'
 import { Geist_Mono } from 'next/font/google'
 import '../globals.css'
 
@@ -22,13 +23,16 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className="dark">
-      <body className={`${mono.variable} font-mono bg-gray-950 text-gray-100 min-h-screen`}>
+      <body className={`${mono.variable} font-mono bg-black text-gray-100 min-h-screen`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AuthProvider>
-            <Navbar />
-            <main className="container mx-auto px-4 py-6 max-w-6xl">
-              {children}
-            </main>
+            <MatrixRain />
+            <div className="relative" style={{ zIndex: 1 }}>
+              <Navbar />
+              <main className="container mx-auto px-4 py-6 max-w-6xl">
+                {children}
+              </main>
+            </div>
           </AuthProvider>
         </NextIntlClientProvider>
       </body>
