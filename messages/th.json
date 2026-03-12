@@ -100,7 +100,13 @@
     "total_submissions": "การ Submit ทั้งหมด",
     "correct_submissions": "Submit ถูก",
     "reveal_solution": "เปิดเฉลย",
-    "hide_solution": "ซ่อนเฉลย"
+    "hide_solution": "ซ่อนเฉลย",
+    "total_challenges": "โจทย์ทั้งหมด",
+    "visible": "เปิดแสดง",
+    "hidden": "ซ่อน",
+    "total_solves": "Solves ทั้งหมด",
+    "no_challenges": "ยังไม่มีโจทย์ — กด + เพิ่มโจทย์",
+    "confirm_delete": "ลบโจทย์นี้?"
   },
   "common": {
     "loading": "กำลังโหลด...",

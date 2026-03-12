@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useParams, useRouter } from 'next/navigation'
-import { collection, query, where, orderBy, limit, onSnapshot, getDocs } from 'firebase/firestore'
+import { collection, query, where, orderBy, limit, onSnapshot, getDocs, getCountFromServer } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
 import { Submission } from '@/types'
@@ -44,10 +44,10 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user || !profile) return
     async function calcRank() {
-      const snap = await getDocs(query(collection(db, 'users'), where('total_points', '>', profile!.total_points)))
-      setRank(snap.size + 1)
-      const total = await getDocs(collection(db, 'users'))
-      setTotalPlayers(total.size)
+      const snap = await getCountFromServer(query(collection(db, 'users'), where('total_points', '>', profile!.total_points)))
+      setRank(snap.data().count + 1)
+      const total = await getCountFromServer(collection(db, 'users'))
+      setTotalPlayers(total.data().count)
     }
     calcRank()
   }, [profile])

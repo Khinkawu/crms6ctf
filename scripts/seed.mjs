@@ -28,7 +28,7 @@ const app = initializeApp({
 const auth = getAuth(app)
 const db = getFirestore(app)
 
-const sha256 = s => createHash('sha256').update(s).digest('hex')
+const sha256 = s => createHash('sha256').update(s.trim().toLowerCase()).digest('hex')
 
 // ─── Challenge Data ───────────────────────────────────────────────
 const CHALLENGES = [
@@ -64,10 +64,10 @@ const CHALLENGES = [
 
   // ── CRYPTO ──
   {
-    title_th: '亡靈凱撒',
+    title_th: 'Caesar',
     title_en: "Caesar's Ghost",
     description_th: 'จักรพรรดิ Caesar ใช้รหัสลับที่ง่ายมาก\nช่วยถอดรหัสข้อความนี้:\n\n```\nsynt{26r720122sr34oро1о49rq96264рn86s}\n```\n\nหมายเหตุ: flag format คือ flag{...}',
-    description_en: "Julius Caesar used a simple cipher.\nDecode this message:\n\n```\nsynt{26r720122sr34beb1b49ed96264ea86f}\n```\n\nNote: flag format is flag{...}",
+    description_en: "Julius Caesar used a simple cipher.\nDecode this message:\n\n```\nsynt{26r720122sr34oro1o49rq96264rn86s}\n```\n\nNote: flag format is flag{...}",
     category: 'CRYPTO', difficulty: 'Easy', base_points: 100,
     flag: 'flag{26e720122fe34beb1b49ed96264ea86f}',
     hints: [
@@ -75,7 +75,7 @@ const CHALLENGES = [
       { text_th: 'python: import codecs; codecs.decode("synt{...}", "rot_13")', text_en: 'python: import codecs; codecs.decode("synt{...}", "rot_13")', penalty_pct: 25 },
       { text_th: 'CyberChef → ROT13', text_en: 'CyberChef → ROT13', penalty_pct: 50 },
     ],
-    solution_th: 'ROT13: synt → flag\ncodecs.decode("synt{26r720122sr34beb1b49ed96264ea86f}", "rot_13")',
+    solution_th: 'ROT13: synt → flag\ncodecs.decode("synt{26r720122sr34oro1o49rq96264rn86s}", "rot_13")',
     visible: true,
   },
   {
@@ -222,7 +222,7 @@ const CHALLENGES = [
 
 // ─── Main ─────────────────────────────────────────────────────────
 async function main() {
-  const [,, email, password] = process.argv
+  const [, , email, password] = process.argv
   if (!email || !password) {
     console.error('Usage: node scripts/seed.mjs <coach-email> <coach-password>')
     process.exit(1)

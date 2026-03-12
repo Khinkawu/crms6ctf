@@ -10,7 +10,7 @@ export default function AuthPage() {
   const t = useTranslations('auth')
   const { locale } = useParams()
   const router = useRouter()
-  const { signInEmail, signUpEmail, signInGoogle } = useAuth()
+  const { signInEmail, signUpEmail, signInGoogle, resetPassword } = useAuth()
   const [tab, setTab] = useState<Tab>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -18,9 +18,6 @@ export default function AuthPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [submitting, setSubmitting] = useState(false)
-
-  // resetPassword is accessed directly from useAuth
-  const { resetPassword } = useAuth()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

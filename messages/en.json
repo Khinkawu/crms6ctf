@@ -100,7 +100,13 @@
     "total_submissions": "Total Submissions",
     "correct_submissions": "Correct Submissions",
     "reveal_solution": "Reveal Solution",
-    "hide_solution": "Hide Solution"
+    "hide_solution": "Hide Solution",
+    "total_challenges": "Total Challenges",
+    "visible": "Visible",
+    "hidden": "Hidden",
+    "total_solves": "Total Solves",
+    "no_challenges": "No challenges yet — press + to add",
+    "confirm_delete": "Delete this challenge?"
   },
   "common": {
     "loading": "Loading...",

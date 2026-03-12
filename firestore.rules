@@ -1,26 +1,34 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
     function isCoach() {
       return request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'coach';
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'coach';
     }
+
     match /users/{uid} {
-      allow read: if true;
+      allow read: if request.auth != null && (request.auth.uid == uid || isCoach());
       allow write: if request.auth != null && (request.auth.uid == uid || isCoach());
     }
-    match /challenges/{id} {
-      allow read: if resource.data.visible == true || request.auth != null;
-      allow write: if request.auth != null;
+
+    match /challenges/{doc} {
+      allow read: if true;
+      allow write: if isCoach();
     }
-    match /submissions/{id} {
+
+    match /submissions/{doc} {
       allow read: if request.auth != null &&
-        (resource.data.uid == request.auth.uid || isCoach());
+                     (resource.data.uid == request.auth.uid || isCoach());
       allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
       allow delete: if isCoach();
     }
-    match /hints_used/{id} {
-      allow read, write: if request.auth != null;
+
+    match /hints_used/{doc} {
+      allow read: if request.auth != null &&
+                     (resource.data.uid == request.auth.uid || isCoach());
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow update: if request.auth != null && request.resource.data.uid == request.auth.uid;
       allow delete: if isCoach();
     }
   }

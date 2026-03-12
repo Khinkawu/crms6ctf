@@ -9,7 +9,7 @@ import { Challenge } from '@/types'
 import { CATEGORY_COLORS, DIFFICULTY_COLORS } from '@/lib/scoring'
 
 export default function CoachPage() {
-  const t = useTranslations()
+  const t = useTranslations('coach')
   const { locale } = useParams()
   const router = useRouter()
   const { profile, loading } = useAuth()
@@ -35,7 +35,7 @@ export default function CoachPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('ลบโจทย์นี้?')) return
+    if (!confirm(t('confirm_delete'))) return
     setDeleting(id)
     await deleteDoc(doc(db, 'challenges', id))
     setDeleting(null)
@@ -49,22 +49,22 @@ export default function CoachPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-cyan-400">{t('coach.title')}</h1>
+        <h1 className="text-2xl font-bold text-cyan-400">{t('title')}</h1>
         <button
           onClick={() => router.push(`/${locale}/coach/challenges/new`)}
           className="bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-bold px-4 py-2 rounded-lg text-sm transition-colors"
         >
-          + {t('coach.add_challenge')}
+          + {t('add_challenge')}
         </button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'โจทย์ทั้งหมด', value: challenges.length },
-          { label: 'เปิดแสดง', value: visible },
-          { label: 'Solves ทั้งหมด', value: totalSolves },
-          { label: 'ซ่อนอยู่', value: challenges.length - visible },
+          { label: t('total_challenges'), value: challenges.length },
+          { label: t('visible'), value: visible },
+          { label: t('total_solves'), value: totalSolves },
+          { label: t('hidden'), value: challenges.length - visible },
         ].map(({ label, value }) => (
           <div key={label} className="bg-gray-900 border border-gray-700 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-cyan-400">{value}</div>
@@ -76,7 +76,7 @@ export default function CoachPage() {
       {/* Challenge list */}
       <div className="space-y-2">
         {challenges.length === 0 && (
-          <div className="text-center py-16 text-gray-600">ยังไม่มีโจทย์ — กด + เพิ่มโจทย์</div>
+          <div className="text-center py-16 text-gray-600">{t('no_challenges')}</div>
         )}
         {challenges.map(c => (
           <div
@@ -94,7 +94,7 @@ export default function CoachPage() {
                   {c.difficulty}
                 </span>
                 {!c.visible && (
-                  <span className="text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-500">ซ่อน</span>
+                  <span className="text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-500">{t('hidden')}</span>
                 )}
               </div>
               <div className="mt-1 font-medium text-gray-100 truncate">
@@ -108,27 +108,27 @@ export default function CoachPage() {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => toggleVisible(c)}
-                title={t('coach.toggle_visible')}
+                title={t('toggle_visible')}
                 className={`text-xs px-3 py-1.5 rounded border transition-colors ${
                   c.visible
                     ? 'border-green-700 text-green-400 hover:bg-green-900/30'
                     : 'border-gray-600 text-gray-500 hover:border-gray-400 hover:text-gray-300'
                 }`}
               >
-                {c.visible ? 'เปิด' : 'ปิด'}
+                {c.visible ? t('visible') : t('hidden')}
               </button>
               <button
                 onClick={() => router.push(`/${locale}/coach/challenges/${c.id}/edit`)}
                 className="text-xs px-3 py-1.5 rounded border border-gray-600 text-gray-400 hover:border-cyan-400 hover:text-cyan-400 transition-colors"
               >
-                แก้ไข
+                {t('edit_challenge')}
               </button>
               <button
                 onClick={() => handleDelete(c.id)}
                 disabled={deleting === c.id}
                 className="text-xs px-3 py-1.5 rounded border border-gray-700 text-red-500 hover:border-red-700 hover:bg-red-900/20 transition-colors disabled:opacity-40"
               >
-                {deleting === c.id ? '...' : 'ลบ'}
+                {deleting === c.id ? '...' : t('delete_challenge')}
               </button>
             </div>
           </div>

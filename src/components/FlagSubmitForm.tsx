@@ -1,10 +1,9 @@
 'use client'
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { hashFlag } from '@/lib/flag'
 import { db } from '@/lib/firebase'
 import {
-  doc, getDoc, addDoc, collection,
+  doc, addDoc, collection,
   increment, serverTimestamp, runTransaction
 } from 'firebase/firestore'
 import { Challenge, UserProfile } from '@/types'
@@ -32,8 +31,15 @@ export default function FlagSubmitForm({ challenge, userId, profile, onSolved, l
     if (alreadySolved) { setStatus('already'); return }
     setStatus('loading')
 
-    const inputHash = await hashFlag(input)
-    if (inputHash !== challenge.flag_hash) {
+    // Server-side flag validation — flag_hash never sent to client
+    const res = await fetch('/api/verify-flag', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ challengeId: challenge.id, flag: input }),
+    })
+    const { correct } = await res.json()
+
+    if (!correct) {
       await addDoc(collection(db, 'submissions'), {
         uid: userId, challenge_id: challenge.id,
         correct: false, points_awarded: 0, hint_penalty: 0,
@@ -79,12 +85,14 @@ export default function FlagSubmitForm({ challenge, userId, profile, onSolved, l
           first_solve_time: user.first_solve_time || serverTimestamp(),
           last_solve_time: serverTimestamp(),
         })
-      })
 
-      await addDoc(collection(db, 'submissions'), {
-        uid: userId, challenge_id: challenge.id,
-        correct: true, points_awarded: awarded, hint_penalty: 0,
-        timestamp: serverTimestamp(),
+        // Submission inside transaction for atomicity
+        const subRef = doc(collection(db, 'submissions'))
+        tx.set(subRef, {
+          uid: userId, challenge_id: challenge.id,
+          correct: true, points_awarded: awarded, hint_penalty: penalty,
+          timestamp: serverTimestamp(),
+        })
       })
 
       setPointsAwarded(awarded)

@@ -22,7 +22,10 @@ export default function ChallengePage() {
   useEffect(() => {
     if (!id) return
     return onSnapshot(doc(db, 'challenges', id), snap => {
-      if (snap.exists()) setChallenge({ id: snap.id, ...snap.data() } as Challenge)
+      if (snap.exists()) {
+        const { flag_hash, ...safeData } = snap.data()
+        setChallenge({ id: snap.id, ...safeData } as Challenge)
+      }
     })
   }, [id])
 
