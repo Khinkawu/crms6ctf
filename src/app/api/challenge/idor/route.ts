@@ -13,7 +13,7 @@ const USERS: Record<string, { name: string; email: string; role: string; data?: 
     name:  'Administrator',
     email: 'admin@crms6.ac.th',
     role:  'admin',
-    data:  'flag{8d3e7f2a5b9c4d1e6a8f3b7c2d9e4a5f}',
+    data:  '8d3e7f2a5b9c4d1e6a8f3b7c2d9e4a5f',
   },
 }
 

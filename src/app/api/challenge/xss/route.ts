@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 // XSS challenge — reflects user input in HTML response (intentionally unsafe for CTF)
 // Flag is stored in a "cookie" shown only when XSS payload is detected
 // Students learn: unsanitized input → script execution → cookie theft
-const FLAG = 'flag{3c8a1e6b9f2d4e7a5b8c3f1e6d9a2b4c}'
+const FLAG = '3c8a1e6b9f2d4e7a5b8c3f1e6d9a2b4c'
 const SESSION_COOKIE = `session=eyJ1c2VyIjoiYWRtaW4iLCJmbGFnIjoiJHtGTEFHfSJ9` // mock JWT
 
 export async function GET(req: NextRequest) {

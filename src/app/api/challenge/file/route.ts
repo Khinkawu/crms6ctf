@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 // Path Traversal challenge — simulates vulnerable file read endpoint
 // Intended payload: ../../../../etc/passwd  OR  /secret/flag.txt  OR  ../admin/config.txt
-const FLAG = 'flag{6e1b4d9a3c7f2e8b5a9d1c6f4e2b7a3d}'
+const FLAG = '6e1b4d9a3c7f2e8b5a9d1c6f4e2b7a3d'
 
 const FAKE_FS: Record<string, string> = {
   'public/index.html':     '<html>Welcome</html>',

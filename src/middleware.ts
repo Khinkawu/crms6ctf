@@ -7,5 +7,5 @@ export default createMiddleware({
 })
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  matcher: ['/((?!api|_next|_vercel|secret-vault-7f3a9d|secret-archive-c9f2e1|.*\\..*).*)'],
 }

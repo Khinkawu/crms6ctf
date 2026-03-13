@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server'
 const MOCK_USERS = [
   { id: 1, username: 'alice', password: 'hunter2', role: 'user' },
   { id: 2, username: 'bob',   password: 'letmein', role: 'user' },
-  { id: 0, username: 'admin', password: '🔒', role: 'admin', flag: 'flag{7b4e2d9f1c6a8b3e5d7f2a4c9e1b6d8f}' },
+   { id: 0, username: 'admin', password: '🔒', role: 'admin', flag: '7b4e2d9f1c6a8b3e5d7f2a4c9e1b6d8f' },
 ]
 
 function simulateSqliQuery(input: string): typeof MOCK_USERS {

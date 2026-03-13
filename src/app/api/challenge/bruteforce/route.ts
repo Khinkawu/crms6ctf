@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Login successful',
-      flag: 'flag{9a3f2c8e1b7d4a6e5c9b3f2a8e1d7c4b}',
+      flag: '9a3f2c8e1b7d4a6e5c9b3f2a8e1d7c4b',
     })
   }
 
